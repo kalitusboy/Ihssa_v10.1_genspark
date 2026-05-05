@@ -33,7 +33,8 @@ class _StatsScreenState extends State<StatsScreen> {
 
   final List<List<dynamic>> _detailRows = [];
   final List<String> _detailHeaders = [
-    'البرنامج', 'عدد المنتهية المشغولة', 'كهرباء', 'غاز', 'مياه', 'تطهير'
+    'البرنامج', 'الحصة', 'محصاة', 'نسبة الإنجاز %', 'المنتهية المشغولة',
+    'كهرباء', 'غاز', 'مياه', 'تطهير'
   ];
 
   int _grandQuota = 0;
@@ -87,7 +88,10 @@ class _StatsScreenState extends State<StatsScreen> {
     _grandStatus.updateAll((key, value) => 0);
     _grandE = _grandG = _grandW = _grandS = 0;
 
-    // إضافة صف لكل برنامج حتى لو لم تكن فيه حالات محصاة
+    // متغيرات لتجميع قيم المحصاة المشغولة فقط (للإجمالي في الجدول التفصيلي)
+    int grandOccCount = 0;
+    int grandOccE = 0, grandOccG = 0, grandOccW = 0, grandOccS = 0;
+
     for (var program in programs) {
       final programData = _data.where((b) => _normalizeProgram(b.program) == program).toList();
       final programDone = programData.where((b) => b.done == 1).toList();
@@ -108,12 +112,14 @@ class _StatsScreenState extends State<StatsScreen> {
       final wSum = programDone.fold(0, (sum, b) => sum + b.water);
       final sSum = programDone.fold(0, (sum, b) => sum + b.sewage);
 
+      // تحديث الإجماليات العامة (للجدول الرئيسي)
       statusCounts.forEach((k, v) => _grandStatus[k] = (_grandStatus[k] ?? 0) + v);
       _grandE += eSum;
       _grandG += gSum;
       _grandW += wSum;
       _grandS += sSum;
 
+      // صف الجدول الرئيسي
       _mainRows.add([
         program,
         quota,
@@ -129,17 +135,36 @@ class _StatsScreenState extends State<StatsScreen> {
         sSum,
       ]);
 
+      // --- بناء صف الجدول التفصيلي (المنتهية والمشغولة فقط) ---
       final occupied = programDone.where((b) => _safeText(b.status) == "منتهية ومشغولة").toList();
-      if (occupied.isNotEmpty) {
-        final occE = occupied.fold(0, (sum, b) => sum + b.electricity);
-        final occG = occupied.fold(0, (sum, b) => sum + b.gas);
-        final occW = occupied.fold(0, (sum, b) => sum + b.water);
-        final occS = occupied.fold(0, (sum, b) => sum + b.sewage);
-        _detailRows.add([program, occupied.length, occE, occG, occW, occS]);
-      }
+      final occCount = occupied.length;
+      final occE = occupied.fold(0, (sum, b) => sum + b.electricity);
+      final occG = occupied.fold(0, (sum, b) => sum + b.gas);
+      final occW = occupied.fold(0, (sum, b) => sum + b.water);
+      final occS = occupied.fold(0, (sum, b) => sum + b.sewage);
+
+      // نجمعها للإجمالي النهائي
+      grandOccCount += occCount;
+      grandOccE += occE;
+      grandOccG += occG;
+      grandOccW += occW;
+      grandOccS += occS;
+
+      // نضيف صف البرنامج (حتى لو occCount = 0) للحفاظ على نفس الترتيب
+      _detailRows.add([
+        program,
+        quota,
+        done,
+        '$progress%',
+        occCount,
+        occE,
+        occG,
+        occW,
+        occS,
+      ]);
     }
 
-    // صف الإجمالي الرئيسي
+    // صف الإجمالي للجدول الرئيسي
     final totalProgress = _grandQuota > 0 ? (_grandDone / _grandQuota * 100).round() : 0;
     _mainRows.add([
       'الإجمالي',
@@ -156,74 +181,75 @@ class _StatsScreenState extends State<StatsScreen> {
       _grandS,
     ]);
 
-    // إجمالي الجدول التفصيلي
-    final totalOcc = _grandStatus["منتهية ومشغولة"] ?? 0;
-     if (totalOcc > 0) {
-      final allDone = _data.where((b) => b.done == 1).toList();
-      final occupiedAll = allDone.where((b) => _safeText(b.status) == "منتهية ومشغولة").toList();
-      final totalOccE = occupiedAll.fold(0, (sum, b) => sum + b.electricity);
-      final totalOccG = occupiedAll.fold(0, (sum, b) => sum + b.gas);
-      final totalOccW = occupiedAll.fold(0, (sum, b) => sum + b.water);
-      final totalOccS = occupiedAll.fold(0, (sum, b) => sum + b.sewage);
-      _detailRows.add(['الإجمالي', totalOcc, totalOccE, totalOccG, totalOccW, totalOccS]);
-    }
+    // صف الإجمالي للجدول التفصيلي
+    _detailRows.add([
+      'الإجمالي',
+      _grandQuota,
+      _grandDone,
+      '$totalProgress%',
+      grandOccCount,
+      grandOccE,
+      grandOccG,
+      grandOccW,
+      grandOccS,
+    ]);
   }
-  
- // استبدل الدالة _exportStatistics بالنسخة التالية
-Future<void> _exportStatistics() async {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => const Center(child: CircularProgressIndicator()),
-  );
 
-  try {
-    final fileName =
-        'تقرير_إحصائي_${DateTime.now().millisecondsSinceEpoch}.xlsx';
-
-    final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}/$fileName';
-
-    final exportedPath = await _excelService.exportStatisticsToFile(
-      filePath: filePath,
-      mainHeaders: _mainHeaders,
-      mainRows: _mainRows,
-      detailHeaders: _detailHeaders,
-      detailRows: _detailRows,
-      openAfterSave: false,
+  // استبدل الدالة _exportStatistics بالنسخة التالية
+  Future<void> _exportStatistics() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
-    if (!mounted) return;
+    try {
+      final fileName =
+          'تقرير_إحصائي_${DateTime.now().millisecondsSinceEpoch}.xlsx';
 
-    Navigator.of(context, rootNavigator: true).pop();
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/$fileName';
 
-    if (exportedPath != null) {
-      await OpenFile.open(exportedPath);
+      final exportedPath = await _excelService.exportStatisticsToFile(
+        filePath: filePath,
+        mainHeaders: _mainHeaders,
+        mainRows: _mainRows,
+        detailHeaders: _detailHeaders,
+        detailRows: _detailRows,
+        openAfterSave: false,
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (exportedPath != null) {
+        await OpenFile.open(exportedPath);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ تم تصدير التقرير: $fileName'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        throw Exception('فشل إنشاء الملف');
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      debugPrint('Export error: $e');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✅ تم تصدير التقرير: $fileName'),
-          backgroundColor: Colors.green,
+          content: Text('❌ خطأ: $e'),
+          backgroundColor: Colors.red,
         ),
       );
-    } else {
-      throw Exception('فشل إنشاء الملف');
     }
-  } catch (e) {
-    if (!mounted) return;
-
-    Navigator.of(context, rootNavigator: true).pop();
-
-    debugPrint('Export error: $e');
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('❌ خطأ: $e'),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {
