@@ -1,0 +1,28 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.packages
+.pub/
+build/
+pubspec.lock   # أزل هذا السطر إن أردت تثبيت الحزم (أفضل للمشاريع المنشورة)
+
+# Android / Gradle
+.gradle/
+local.properties
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Databases
+*.db
+
+# Misc
+*.log
