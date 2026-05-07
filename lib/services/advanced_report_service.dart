@@ -74,42 +74,41 @@ class AdvancedReportService {
   // ① حساب الإحصائيات لكل برنامج — بنفس ترتيب شاشة الإحصائيات
   // ════════════════════════════════════════════════════════════════
   Future<List<ProgramAdvanced>> computePerProgram() async {
-    final db = await _db.database;
-    final rows = await db.rawQuery('''
-      SELECT
-        program,
-        COUNT(*) AS quota,
-        SUM(CASE WHEN done=1 THEN 1 ELSE 0 END) AS done,
-        SUM(CASE WHEN done=1 AND status='في طور الانجاز'    THEN 1 ELSE 0 END) AS in_progress,
-        SUM(CASE WHEN done=1 AND status='على مستوى الاعمدة' THEN 1 ELSE 0 END) AS pillars,
-        SUM(CASE WHEN done=1 AND status='منتهية غير مشغولة' THEN 1 ELSE 0 END) AS fin_not_occ,
-        SUM(CASE WHEN done=1 AND status='منتهية ومشغولة'    THEN 1 ELSE 0 END) AS occupied,
+   final db = await _db.database;
+   final rows = await db.rawQuery('''
+    SELECT
+      program,
+      COUNT(*) AS quota,
+      SUM(CASE WHEN done=1 THEN 1 ELSE 0 END) AS done,
+      SUM(CASE WHEN done=1 AND status='في طور الانجاز'    THEN 1 ELSE 0 END) AS in_progress,
+      SUM(CASE WHEN done=1 AND status='على مستوى الاعمدة' THEN 1 ELSE 0 END) AS pillars,
+      SUM(CASE WHEN done=1 AND status='منتهية غير مشغولة' THEN 1 ELSE 0 END) AS fin_not_occ,
+      SUM(CASE WHEN done=1 AND status='منتهية ومشغولة'    THEN 1 ELSE 0 END) AS occupied,
 
-        -- المنتهية المشغولة + شبكة معينة
-        SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND electricity=1 THEN 1 ELSE 0 END) AS elec,
-        SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND gas=1         THEN 1 ELSE 0 END) AS gas,
-        SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND water=1       THEN 1 ELSE 0 END) AS water,
-        SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND sewage=1      THEN 1 ELSE 0 END) AS sew,
+      SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND electricity=1 THEN 1 ELSE 0 END) AS elec,
+      SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND gas=1         THEN 1 ELSE 0 END) AS gas,
+      SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND water=1       THEN 1 ELSE 0 END) AS water,
+      SUM(CASE WHEN done=1 AND status='منتهية ومشغولة' AND sewage=1      THEN 1 ELSE 0 END) AS sew,
 
-        -- "كل الحالات" — مطابق لشاشة الإحصائيات (المحصاة بأي حالة)
-        SUM(CASE WHEN done=1 AND electricity=1 THEN 1 ELSE 0 END) AS elec_all,
-        SUM(CASE WHEN done=1 AND gas=1         THEN 1 ELSE 0 END) AS gas_all,
-        SUM(CASE WHEN done=1 AND water=1       THEN 1 ELSE 0 END) AS water_all,
-        SUM(CASE WHEN done=1 AND sewage=1      THEN 1 ELSE 0 END) AS sew_all,
+      SUM(CASE WHEN done=1 AND electricity=1 THEN 1 ELSE 0 END) AS elec_all,
+      SUM(CASE WHEN done=1 AND gas=1         THEN 1 ELSE 0 END) AS gas_all,
+      SUM(CASE WHEN done=1 AND water=1       THEN 1 ELSE 0 END) AS water_all,
+      SUM(CASE WHEN done=1 AND sewage=1      THEN 1 ELSE 0 END) AS sew_all,
 
-        SUM(CASE WHEN done=1 AND status='منتهية ومشغولة'
-                  AND electricity=1 AND gas=1 AND water=1
-                 THEN 1 ELSE 0 END) AS all3,
-        SUM(CASE WHEN done=1 AND status='منتهية ومشغولة'
-                  AND electricity=1 AND gas=1 AND water=1 AND sewage=1
-                 THEN 1 ELSE 0 END) AS all4,
+      SUM(CASE WHEN done=1 AND status='منتهية ومشغولة'
+               AND electricity=1 AND gas=1 AND water=1
+              THEN 1 ELSE 0 END) AS all3,
+      SUM(CASE WHEN done=1 AND status='منتهية ومشغولة'
+               AND electricity=1 AND gas=1 AND water=1 AND sewage=1
+              THEN 1 ELSE 0 END) AS all4,
 
-        MIN(created_at) AS first_added
-      FROM beneficiaries
-      WHERE program IS NOT NULL AND program != ''
-      GROUP BY program
-      ORDER BY first_added ASC, program ASC
-    ''');
+      MAX(id) AS max_id   -- ★ بدلاً من MIN(created_at)
+     FROM beneficiaries
+     WHERE program IS NOT NULL AND program != ''
+     GROUP BY program
+     ORDER BY max_id DESC    -- ★ ترتيب مطابق لـ correct_stats_screen
+   ''');
+  // ... باقي الكود كما هو
 
     return rows.map((r) => ProgramAdvanced(
       program:        (r['program']     ?? '').toString(),
