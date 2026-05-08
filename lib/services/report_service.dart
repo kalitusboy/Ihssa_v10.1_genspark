@@ -122,16 +122,8 @@ class ReportService {
   // ──────────────────────────────────────────────
   Future<String> exportPhotosZip(
     String program, List<Map<String, String>> images) async {
+   final archive = Archive();
    int count = 0;
-
-   final dl = await _outputDir();
-   final safeProg = program
-      .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
-      .replaceAll(' ', '_');
-   final zipPath = p.join(dl.path, 'صور_المنتهية_المشغولة_${safeProg}_${DateTime.now().millisecondsSinceEpoch}.zip');
-
-   final encoder = ZipFileEncoder();
-    encoder.create(zipPath);
 
    for (final img in images) {
     final path = img['path'] ?? '';
@@ -139,20 +131,28 @@ class ReportService {
     if (path.isEmpty || name.isEmpty) continue;
     final file = File(path);
     if (!await file.exists()) continue;
-    // اسم الملف داخل ZIP: اسم_البرنامج_اسم_الصورة_الأصلي
+    final bytes = await file.readAsBytes();
+    final safeProg = program
+        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+        .replaceAll(' ', '_');
+    // اسم الملف = اسم_البرنامج + اسم_الصورة_الأصلي (بدون تكرار)
     final entry = '${safeProg}_$name'.replaceAll(' ', '_');
-    await encoder.addFile(file, entryName: entry);
+    archive.addFile(ArchiveFile(entry, bytes.length, bytes));
     count++;
    }
 
-   await encoder.close();
+   if (count == 0) throw Exception('لا توجد صور للتصدير');
 
-   if (count == 0) {
-    await File(zipPath).delete();
-    throw Exception('لا توجد صور للتصدير');
-   }
+   final zipBytes = ZipEncoder().encode(archive)!;
+   final dl = await _outputDir();
 
-   return zipPath;
+   final safeProg = program
+      .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+      .replaceAll(' ', '_');
+   final fname = 'صور_المنتهية_المشغولة_${safeProg}_$count.zip';
+   final file = File(p.join(dl.path, fname));
+   await file.writeAsBytes(zipBytes);
+   return file.path;
   }
   
   // ──────────────────────────────────────────────
