@@ -29,45 +29,37 @@ class ExportService {
   }
 
   Future<void> exportImagesAsZip() async {
-    try {
-      final beneficiaries = await _dbService.getCompletedBeneficiaries();
-      final withImages = beneficiaries.where((b) {
-        if (b.imagePath == null) return false;
-        return File(b.imagePath!).existsSync();
-      }).toList();
-      
-      if (withImages.isEmpty) {
-        throw Exception('لا توجد صور للتصدير');
-      }
-      
-      final archive = Archive();
-      
-      for (var beneficiary in withImages) {
-        final imageFile = File(beneficiary.imagePath!);
-        final imageBytes = await imageFile.readAsBytes();
-        
-        final fileName = beneficiary.imageFileName ?? 
-            '${beneficiary.displayName}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        
-        archive.addFile(ArchiveFile(fileName, imageBytes.length, imageBytes));
-      }
-      
-      final zipData = ZipEncoder().encode(archive);
-      if (zipData == null) {
-        throw Exception('فشل إنشاء ملف ZIP');
-      }
-      
-      final directory = await getApplicationDocumentsDirectory();
-      final zipName = 'صور_الميدان_${DateTime.now().millisecondsSinceEpoch}.zip';
-      final zipPath = '${directory.path}/$zipName';
-      
-      final zipFile = File(zipPath);
-      await zipFile.writeAsBytes(zipData);
-      
-      await Share.shareXFiles([XFile(zipPath)], text: 'صور الميدان - إحصاء 2026');
-    } catch (e) {
-      throw Exception('فشل تصدير الصور: $e');
+   try {
+    final beneficiaries = await _dbService.getCompletedBeneficiaries();
+    final withImages = beneficiaries.where((b) {
+      if (b.imagePath == null) return false;
+      return File(b.imagePath!).existsSync();
+    }).toList();
+
+    if (withImages.isEmpty) {
+      throw Exception('لا توجد صور للتصدير');
     }
+
+    final directory = await getApplicationDocumentsDirectory();
+    final zipName = 'صور_الميدان_${DateTime.now().millisecondsSinceEpoch}.zip';
+    final zipPath = '${directory.path}/$zipName';
+
+    final encoder = ZipFileEncoder();
+    encoder.create(zipPath);
+
+    for (var beneficiary in withImages) {
+     final imageFile = File(beneficiary.imagePath!);
+     final fileName = beneficiary.imageFileName ?? 
+          '${beneficiary.displayName}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+     await encoder.addFile(imageFile, entryName: fileName);
+    }
+
+     await encoder.close();
+
+     await Share.shareXFiles([XFile(zipPath)], text: 'صور الميدان - إحصاء 2026');
+   } catch (e) {
+     throw Exception('فشل تصدير الصور: $e');
+   }
   }
 
   Future<Map<String, int>> mergeDatabases() async {
