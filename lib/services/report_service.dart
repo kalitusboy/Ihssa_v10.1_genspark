@@ -19,7 +19,7 @@ class ReportData {
   // ── أعضاء اللجنة (3 أعضاء حسب صورة الـ PV) ──
   final String member1Name;     // حمزي إيمان – رئيسة فرع السكن للدائرة
   final String member1Role;
-  final String member2Name;     // قاعدة سالم – المكلف بالبناء الريفي/الدائرة
+  final String member2Name;     // قادة سالم – المكلف بالبناء الريفي/الدائرة
   final String member2Role;
   final String member3Name;     // حميتي نسيم – المكلف بالبناء الريفي/البلدية
   final String member3Role;
@@ -172,16 +172,16 @@ class ReportService {
 
 <!-- ولاية / دائرة / بلدية / رقم — على اليمين -->
 <w:p><w:pPr><w:jc w:val="right"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="24"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">ولاية: ${_x(d.wilaya)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="24"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">دائرة: ${_x(d.daira)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="24"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">بلدية: ${_x(d.baladia)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/><w:spacing w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="24"/><w:rtl/><w:u w:val="single"/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/><w:u w:val="single"/></w:rPr>
     <w:t xml:space="preserve">رقم: ${_x(d.reportNumber)}</w:t></w:r></w:p>
 
 <!-- ═══════════════ العنوان ═══════════════ -->
@@ -194,34 +194,34 @@ class ReportService {
 
 <!-- ═══════════════ ديباجة اللجنة ═══════════════ -->
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="200" w:after="120"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:pPr><w:jc w:val="right"/><w:spacing w:before="200" w:after="120"/></w:pPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">في يوم ${_x(d.date)} ، قامت اللجنة المكلفة بإحصاء و متابعة السكن ، و المشكلة من :</w:t>
   </w:r>
 </w:p>
 
 <w:p><w:pPr><w:jc w:val="right"/><w:ind w:right="720"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">- السيدة : ${_x(d.member1Name)} ${_x(d.member1Role)}</w:t></w:r></w:p>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
+    <w:t xml:space="preserve">- السيد(ة) : ${_x(d.member1Name)} ${_x(d.member1Role)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/><w:ind w:right="720"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">- السيد : ${_x(d.member2Name)} ${_x(d.member2Role)}</w:t></w:r></w:p>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
+    <w:t xml:space="preserve">- السيد(ة) : ${_x(d.member2Name)} ${_x(d.member2Role)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">- السيد : ${_x(d.member3Name)} ${_x(d.member3Role)}</w:t></w:r></w:p>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
+    <w:t xml:space="preserve">- السيد(ة) : ${_x(d.member3Name)} ${_x(d.member3Role)}</w:t></w:r></w:p>
 
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="120" w:after="120"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:pPr><w:jc w:val="right"/><w:spacing w:before="120" w:after="120"/></w:pPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">بتنفيذ معاينة ميدانية و إحصاء شامل للسكنات الريفية ضمن برنامج : </w:t>
   </w:r>
-  <w:r><w:rPr><w:b/><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t>${_x(d.program)}</w:t></w:r>
 </w:p>
 
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="0" w:after="240"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:pPr><w:jc w:val="right"/><w:spacing w:before="0" w:after="240"/></w:pPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t>بعد إتمام عملية المعاينة و الجرد الدقيق ، خلصت اللجنة إلى ما يلي :</w:t>
   </w:r>
 </w:p>
@@ -229,13 +229,12 @@ class ReportService {
 <!-- ═══════════════ أولا : معلومات البرنامج ═══════════════ -->
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:spacing w:before="120" w:after="120"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="26"/><w:rtl/><w:u w:val="single"/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/><w:u w:val="single"/></w:rPr>
     <w:t>أولا : معلومات البرنامج</w:t>
   </w:r>
 </w:p>
 
-<!-- جدول 7 أعمدة مطابق للصورة:
-     البلدية | تعيين البرنامج | الحصة | عدد المشغولة | كهرباء | غاز | ماء -->
+<!-- جدول 7 أعمدة -->
 <w:tbl>
   <w:tblPr>
     <w:tblW w:w="9500" w:type="dxa"/>
@@ -255,7 +254,6 @@ class ReportService {
     <w:gridCol w:w="1400"/><w:gridCol w:w="1400"/><w:gridCol w:w="1400"/>
     <w:gridCol w:w="1400"/>
   </w:tblGrid>
-  <!-- صف العناوين -->
   <w:tr>
     ${_th('البلدية', 1300)}
     ${_th('تعيين البرنامج', 1700)}
@@ -265,7 +263,6 @@ class ReportService {
     ${_th('عدد السكنات المربوطة بالغاز', 1400)}
     ${_th('عدد السكنات المربوطة بالماء', 1400)}
   </w:tr>
-  <!-- صف القيم -->
   <w:tr>
     ${_td(_x(d.baladia), 1300, bold: true)}
     ${_td(_x(d.program), 1700, bold: true)}
@@ -280,40 +277,49 @@ class ReportService {
 <!-- ═══════════════ ثانيا : المرفقات ═══════════════ -->
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:spacing w:before="320" w:after="120"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="26"/><w:rtl/><w:u w:val="single"/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/><w:u w:val="single"/></w:rPr>
     <w:t>ثانيا : المرفقات</w:t>
   </w:r>
 </w:p>
 
+<!-- ★ التصحيح النهائي: (cd) بحروف صغيرة -->
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="0" w:after="80"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">ضمن قرص مضغوط (CD) يتضمن :</w:t>
+  <w:pPr><w:jc w:val="right"/><w:spacing w:before="0" w:after="80"/></w:pPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
+    <w:t xml:space="preserve">ضمن قرص مضغوط (cd) يتضمن :</w:t>
   </w:r>
 </w:p>
 
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:before="0" w:after="60"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t>• جدول بياني تفصيلي يحتوي على القائمة الاسمية للمستفيدين ، الحالة الفيزيائية لكل سكن ، ووضعية الربط بالشبكات .</w:t>
   </w:r>
 </w:p>
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:before="0" w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t>• صور توثق وضعية البنايات .</w:t>
   </w:r>
 </w:p>
 
 <!-- ═══════════════ خاتمة ═══════════════ -->
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="240" w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:pPr><w:jc w:val="center"/><w:spacing w:before="240" w:after="120"/></w:pPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t>اقفل المحضر في نفس اليوم و الشهر و السنة المذكورين أعلاه .</w:t>
   </w:r>
 </w:p>
 
-<!-- جدول التوقيعات -->
+<!-- خط مستقيم قصير -->
+<w:p>
+  <w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="200"/></w:pPr>
+  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
+    <w:t>______</w:t>
+  </w:r>
+</w:p>
+
+<!-- ═══════════════ جدول التوقيعات ═══════════════ -->
 <w:tbl>
   <w:tblPr>
     <w:tblW w:w="9500" w:type="dxa"/>
@@ -329,9 +335,9 @@ class ReportService {
     <w:gridCol w:w="3166"/><w:gridCol w:w="3167"/><w:gridCol w:w="3167"/>
   </w:tblGrid>
   <w:tr>
-    ${_thNB('رئيسة فرع السكن – الدائرة')}
-    ${_thNB('المكلف بالبناء الريفي – البلدية')}
-    ${_thNB('المكلف بالبناء الريفي – البلدية')}
+    ${_thNB('رئيس(ة) فرع السكن')}
+    ${_thNB('المكلف(ة) بالبناء الريفي على مستوى الدائرة')}
+    ${_thNB('المكلف(ة) بالبناء الريفي على مستوى البلدية')}
   </w:tr>
   <w:tr><w:trPr><w:trHeight w:val="900"/></w:trPr>
     ${_tdNB('………………………………')}
@@ -348,98 +354,3 @@ class ReportService {
 </w:body>
 </w:document>''';
   }
-
-  // ── دوال مساعدة لبناء خلايا الجدول ─────────────
-  String _th(String text, int w) => '''
-<w:tc>
-  <w:tcPr><w:tcW w:w="$w" w:type="dxa"/>
-    <w:shd w:val="clear" w:color="auto" w:fill="DDDDDD"/>
-    <w:vAlign w:val="center"/>
-  </w:tcPr>
-  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r><w:rPr><w:b/><w:sz w:val="20"/><w:rtl/></w:rPr><w:t xml:space="preserve">${_x(text)}</w:t></w:r>
-  </w:p>
-</w:tc>''';
-
-  String _td(String text, int w, {bool bold = false}) => '''
-<w:tc>
-  <w:tcPr><w:tcW w:w="$w" w:type="dxa"/>
-    <w:vAlign w:val="center"/>
-  </w:tcPr>
-  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r><w:rPr>${bold ? '<w:b/>' : ''}<w:sz w:val="22"/><w:rtl/></w:rPr><w:t xml:space="preserve">$text</w:t></w:r>
-  </w:p>
-</w:tc>''';
-
-  String _thNB(String text) => '''
-<w:tc>
-  <w:tcPr><w:tcW w:w="3167" w:type="dxa"/></w:tcPr>
-  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r><w:rPr><w:b/><w:sz w:val="20"/><w:rtl/></w:rPr><w:t xml:space="preserve">${_x(text)}</w:t></w:r>
-  </w:p>
-</w:tc>''';
-
-  String _tdNB(String text) => '''
-<w:tc>
-  <w:tcPr><w:tcW w:w="3167" w:type="dxa"/></w:tcPr>
-  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r><w:rPr><w:sz w:val="20"/><w:rtl/></w:rPr><w:t xml:space="preserve">$text</w:t></w:r>
-  </w:p>
-</w:tc>''';
-
-  // ── XML escaping & utf8 ─────────────────────────
-  String _x(String s) =>
-      s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-  List<int> _utf8(String s) => utf8.encode(s);
-
-  // ── ملفات DOCX الداعمة ──────────────────────────
-  String _contentTypes() => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml"
-    ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml"
-    ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-  <Override PartName="/word/settings.xml"
-    ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
-</Types>''';
-
-  String _rootRels() => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1"
-    Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
-    Target="word/document.xml"/>
-</Relationships>''';
-
-  String _documentRels() => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1"
-    Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"
-    Target="styles.xml"/>
-  <Relationship Id="rId2"
-    Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings"
-    Target="settings.xml"/>
-</Relationships>''';
-
-  String _styles() => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:docDefaults>
-    <w:rPrDefault><w:rPr>
-      <w:rFonts w:ascii="Arabic Typesetting" w:hAnsi="Arabic Typesetting" w:cs="Arabic Typesetting"/>
-      <w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:bidi="ar-DZ"/>
-    </w:rPr></w:rPrDefault>
-    <w:pPrDefault><w:pPr>
-      <w:bidi/><w:spacing w:after="120" w:line="276" w:lineRule="auto"/>
-    </w:pPr></w:pPrDefault>
-  </w:docDefaults>
-</w:styles>''';
-
-  String _settings() => '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:zoom w:percent="100"/>
-  <w:defaultTabStop w:val="720"/>
-  <w:characterSpacingControl w:val="doNotCompress"/>
-  <w:themeFontLang w:val="en-US" w:bidi="ar-DZ"/>
-</w:settings>''';
-}
