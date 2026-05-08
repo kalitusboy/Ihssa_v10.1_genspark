@@ -215,42 +215,32 @@ class AdvancedReportService {
       where: where.toString(), whereArgs: args);
    if (rows.isEmpty) throw Exception('لا توجد صور للمنتهية المشغولة');
 
-   final outDir = await _outputDir();
-   final safe = (program ?? 'الكل').replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
-   final ts   = DateTime.now().millisecondsSinceEpoch;
-   final zipPath = p.join(outDir.path, 'صور_منتهية_مشغولة_${safe}_$ts.zip');
-
-   final encoder = ZipFileEncoder();
-   encoder.create(zipPath);
-
+   final archive = Archive();
    int n = 0;
    for (final r in rows) {
     final path = (r['image_path'] ?? '').toString();
     final name = (r['image_file_name'] ?? '').toString();
     if (path.isEmpty || name.isEmpty) continue;
-
     final f = File(path);
     if (!await f.exists()) continue;
-
+    final bytes = await f.readAsBytes();
     final prog = (r['program'] ?? 'عام').toString().replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
     final ext  = p.extension(name).isEmpty ? '.jpg' : p.extension(name);
-
-    // مجلد باسم البرنامج ، الملف = اسم_البرنامج + اسم_الملف_الأصلي
+    // مجلد باسم البرنامج ، الملف = اسم_البرنامج + اسم_الملف_الأصلي (بدون تكرار)
     final entry = '$prog/${prog}_$name'.replaceAll(' ', '_');
     final finalEntry = entry.endsWith(ext) ? entry : '$entry$ext';
-
-    // إضافة الملف مباشرة من القرص (بدون تحميله كاملاً في الذاكرة)
-    await encoder.addFile(f, entryName: finalEntry);
+    archive.addFile(ArchiveFile(finalEntry, bytes.length, bytes));
     n++;
    }
+   if (n == 0) throw Exception('لا توجد صور صالحة للتصدير');
 
-   await encoder.close();
-
-   if (n == 0) {
-    await File(zipPath).delete();
-    throw Exception('لا توجد صور صالحة للتصدير');
-   }
-   return zipPath;
+   final outDir = await _outputDir();
+   final safe = (program ?? 'الكل').replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+   final ts   = DateTime.now().millisecondsSinceEpoch;
+   final fp   = p.join(outDir.path, 'صور_منتهية_مشغولة_${safe}_$n\_$ts.zip');
+   final bytes = ZipEncoder().encode(archive)!;
+   await File(fp).writeAsBytes(bytes);
+   return fp;
   }
 
   // ════════════════════════════════════════════════════════════════
