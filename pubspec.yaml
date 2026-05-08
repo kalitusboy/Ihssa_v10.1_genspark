@@ -20,7 +20,7 @@ dependencies:
   # ── ملفات وإكسل ────────────────────────────────
   excel: ^4.0.6             # يحتاج Dart 3.5+ ✅
   file_picker: ^8.1.6       # يحتاج minSdk 23 ✅
-  archive: ^3.6.1
+  archive: ^4.0.0
   share_plus: ^10.1.4
   open_file: ^3.5.10
 
