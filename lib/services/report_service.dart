@@ -19,7 +19,7 @@ class ReportData {
   // ── أعضاء اللجنة (3 أعضاء حسب صورة الـ PV) ──
   final String member1Name;     // حمزي إيمان – رئيسة فرع السكن للدائرة
   final String member1Role;
-  final String member2Name;     // قاعدة سالم – المكلف بالبناء الريفي/الدائرة
+  final String member2Name;     // قادة سالم – المكلف بالبناء الريفي/الدائرة
   final String member2Role;
   final String member3Name;     // حميتي نسيم – المكلف بالبناء الريفي/البلدية
   final String member3Role;
