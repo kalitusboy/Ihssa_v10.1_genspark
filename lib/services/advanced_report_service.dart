@@ -201,48 +201,56 @@ class AdvancedReportService {
   // ④ تصدير صور المنتهية المشغولة → ZIP
   // ════════════════════════════════════════════════════════════════
   Future<String> exportOccupiedFinishedPhotosZip({String? program}) async {
-    final db = await _db.database;
-    final where = StringBuffer(
-        "done=1 AND status='منتهية ومشغولة' "
-        "AND image_file_name IS NOT NULL AND image_file_name != ''");
-    final args = <Object?>[];
-    if (program != null && program.isNotEmpty) {
-      where.write(' AND program = ?');
-      args.add(program);
-    }
-    final rows = await db.query('beneficiaries',
-        columns: ['image_file_name', 'image_path', 'first_name', 'last_name', 'program'],
-        where: where.toString(), whereArgs: args);
-    if (rows.isEmpty) throw Exception('لا توجد صور للمنتهية المشغولة');
+   final db = await _db.database;
+   final where = StringBuffer(
+      "done=1 AND status='منتهية ومشغولة' "
+      "AND image_file_name IS NOT NULL AND image_file_name != ''");
+   final args = <Object?>[];
+   if (program != null && program.isNotEmpty) {
+    where.write(' AND program = ?');
+    args.add(program);
+   }
+   final rows = await db.query('beneficiaries',
+      columns: ['image_file_name', 'image_path', 'first_name', 'last_name', 'program'],
+      where: where.toString(), whereArgs: args);
+   if (rows.isEmpty) throw Exception('لا توجد صور للمنتهية المشغولة');
 
-    final archive = Archive();
-    int n = 0;
-    for (final r in rows) {
-      final path = (r['image_path'] ?? '').toString();
-      final name = (r['image_file_name'] ?? '').toString();
-      if (path.isEmpty || name.isEmpty) continue;
-      final f = File(path);
-      if (!await f.exists()) continue;
-      final bytes = await f.readAsBytes();
-      final prog = (r['program'] ?? 'عام').toString().replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
-      final fn   = (r['first_name'] ?? '').toString().trim();
-      final ln   = (r['last_name']  ?? '').toString().trim();
-      final ext  = p.extension(name).isEmpty ? '.jpg' : p.extension(name);
-      final entry = '$prog/${ln}_${fn}_$name'.replaceAll(' ', '_');
-      archive.addFile(ArchiveFile(
-          entry.endsWith(ext) ? entry : '$entry$ext',
-          bytes.length, bytes));
-      n++;
-    }
-    if (n == 0) throw Exception('لا توجد صور صالحة للتصدير');
+   final outDir = await _outputDir();
+   final safe = (program ?? 'الكل').replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+   final ts   = DateTime.now().millisecondsSinceEpoch;
+   final zipPath = p.join(outDir.path, 'صور_منتهية_مشغولة_${safe}_$ts.zip');
 
-    final outDir = await _outputDir();
-    final safe = (program ?? 'الكل').replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
-    final ts   = DateTime.now().millisecondsSinceEpoch;
-    final fp   = p.join(outDir.path, 'صور_منتهية_مشغولة_${safe}_$n\_$ts.zip');
-    final bytes = ZipEncoder().encode(archive)!;
-    await File(fp).writeAsBytes(bytes);
-    return fp;
+   final encoder = ZipFileEncoder();
+   encoder.create(zipPath);
+
+   int n = 0;
+   for (final r in rows) {
+    final path = (r['image_path'] ?? '').toString();
+    final name = (r['image_file_name'] ?? '').toString();
+    if (path.isEmpty || name.isEmpty) continue;
+
+    final f = File(path);
+    if (!await f.exists()) continue;
+
+    final prog = (r['program'] ?? 'عام').toString().replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+    final ext  = p.extension(name).isEmpty ? '.jpg' : p.extension(name);
+
+    // مجلد باسم البرنامج ، الملف = اسم_البرنامج + اسم_الملف_الأصلي
+    final entry = '$prog/${prog}_$name'.replaceAll(' ', '_');
+    final finalEntry = entry.endsWith(ext) ? entry : '$entry$ext';
+
+    // إضافة الملف مباشرة من القرص (بدون تحميله كاملاً في الذاكرة)
+    await encoder.addFile(f, entryName: finalEntry);
+    n++;
+   }
+
+   await encoder.close();
+
+   if (n == 0) {
+    await File(zipPath).delete();
+    throw Exception('لا توجد صور صالحة للتصدير');
+   }
+   return zipPath;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -281,7 +289,7 @@ class AdvancedReportService {
     final pdf = pw.Document(
       theme: theme,
       title: 'تقرير إحصائي متقدم',
-      author: 'تطبيق التقارير المتقدمة v11.01',
+      author: 'تطبيق التقارير المتقدمة ',
     );
 
     // ── أنماط النصوص العربية (RTL) ─────────────────────────────
@@ -390,7 +398,7 @@ class AdvancedReportService {
             child: ctx.pageNumber == 1
                 ? pw.SizedBox.shrink()
                 : pw.Text(
-                    'تقرير إحصائي متقدم — السكن الريفي',
+                    'تقرير إحصائي متقدم — للسكن الريفي',
                     textDirection: pw.TextDirection.rtl,
                     style: arBold(10, color: PdfColors.indigo900),
                   ),
@@ -404,7 +412,7 @@ class AdvancedReportService {
             alignment: pw.Alignment.center,
             margin: const pw.EdgeInsets.only(top: 6),
             child: pw.Text(
-              'تطبيق التقارير المتقدمة v11.01 — صفحة ${ctx.pageNumber}/${ctx.pagesCount}',
+              ' التقارير المتقدمة  — صفحة ${ctx.pageNumber}/${ctx.pagesCount}',
               textDirection: pw.TextDirection.rtl,
               style: arReg(9, color: PdfColors.grey700),
             ),
@@ -457,7 +465,7 @@ class AdvancedReportService {
             textDirection: pw.TextDirection.rtl,
             child: pw.Center(
               child: pw.Text(
-                'تقرير إحصائي متقدم — السكن الريفي',
+                'تقرير متقدم —لإحصاء السكن الريفي',
                 textDirection: pw.TextDirection.rtl,
                 style: arBold(18, color: PdfColors.indigo900),
               ),
@@ -697,10 +705,10 @@ class AdvancedReportService {
             ),
           ),
           pw.SizedBox(height: 4),
-          _bullet(arText, 'الجدول ① مطابق تماماً لجدول "الإحصائيات العامة" في شاشة الإحصائيات (نفس الأعمدة ونفس ترتيب البرامج).'),
+          _bullet(arText, 'الجدول ①  "الإحصائيات العامة".'),
           _bullet(arText, 'الجدول ② يخصّ تحليل الربط بالشبكات للسكنات المنتهية والمشغولة فقط.'),
           _bullet(arText, 'عمود "كل الشبكات" = مربوطة بالكهرباء والغاز والماء معاً.'),
-          _bullet(arText, 'المصدر: قاعدة بيانات تطبيق إحصاء السكن الريفي v11.01.'),
+          _bullet(arText, 'المصدر:الاحصاء الميداني للسكنات الريفية.'),
         ],
       ),
     );
