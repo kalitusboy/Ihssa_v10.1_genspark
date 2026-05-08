@@ -17,9 +17,9 @@ class ReportData {
   final String place;           // مكان التحرير
 
   // ── أعضاء اللجنة (3 أعضاء حسب صورة الـ PV) ──
-  final String member1Name;     // حمزي إيمان – رئيسة فرع السكن للدائرة
+  final String member1Name;     // حمزي إيمان – رئيس فرع السكن للدائرة
   final String member1Role;
-  final String member2Name;     // قاعدة سالم – المكلف بالبناء الريفي/الدائرة
+  final String member2Name;     // قادة سالم – المكلف بالبناء الريفي/الدائرة
   final String member2Role;
   final String member3Name;     // حميتي نسيم – المكلف بالبناء الريفي/البلدية
   final String member3Role;
@@ -165,7 +165,7 @@ class ReportService {
 <!-- ═══════════════ الترويسة العلوية ═══════════════ -->
 <w:p>
   <w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/><w:u w:val="single"/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="36"/><w:rtl/><w:u w:val="single"/></w:rPr>
     <w:t>الجمهورية الجزائرية الديمقراطية الشعبية</w:t>
   </w:r>
 </w:p>
@@ -181,7 +181,7 @@ class ReportService {
   <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">بلدية: ${_x(d.baladia)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/><w:spacing w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/><w:u w:val="single"/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="22"/><w:rtl/><w:u w:val="single"/></w:rPr>
     <w:t xml:space="preserve">رقم: ${_x(d.reportNumber)}</w:t></w:r></w:p>
 
 <!-- ═══════════════ العنوان ═══════════════ -->
@@ -196,7 +196,7 @@ class ReportService {
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:spacing w:before="200" w:after="120"/></w:pPr>
   <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">في يوم ${_x(d.date)} ، قامت اللجنة المكلفة بإحصاء و متابعة السكن ، و المشكلة من :</w:t>
+    <w:t xml:space="preserve">في يوم ${_x(d.date)} ، قامت اللجنة المكلفة بإحصاء و متابعة السكن الريفي ، و المشكلة من :</w:t>
   </w:r>
 </w:p>
 
@@ -215,7 +215,7 @@ class ReportService {
   <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">بتنفيذ معاينة ميدانية و إحصاء شامل للسكنات الريفية ضمن برنامج : </w:t>
   </w:r>
-  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="22"/><w:rtl/></w:rPr>
     <w:t>${_x(d.program)}</w:t></w:r>
 </w:p>
 
@@ -285,20 +285,20 @@ class ReportService {
 <!-- التعديل: (cd) صغيرة -->
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:spacing w:before="0" w:after="80"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve"> قرص مضغوط يتضمن (cd) :</w:t>
+  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+    <w:t xml:space="preserve"> :قرص مضغوط يتضمن  </w:t>
   </w:r>
 </w:p>
 
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:before="0" w:after="60"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
     <w:t>• جدول بياني تفصيلي يحتوي على القائمة الاسمية للمستفيدين ، الحالة الفيزيائية لكل سكن ، ووضعية الربط بالشبكات .</w:t>
   </w:r>
 </w:p>
 <w:p>
   <w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:before="0" w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="28"/><w:rtl/></w:rPr>
+  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
     <w:t>• صور توثق وضعية البنايات .</w:t>
   </w:r>
 </w:p>
@@ -336,8 +336,8 @@ class ReportService {
   </w:tblGrid>
   <w:tr>
     ${_thNB('رئيس(ة) فرع السكن')}
-    ${_thNB('المكلف(ة) بالبناء الريفي على مستوى الدائرة')}
-    ${_thNB('المكلف(ة) بالبناء الريفي على مستوى البلدية')}
+    ${_thNB('المكلف(ة) بالبناء الريفي للدائرة')}
+    ${_thNB('المكلف(ة) بالبناء الريفي للبلدية')}
   </w:tr>
   <w:tr><w:trPr><w:trHeight w:val="900"/></w:trPr>
     ${_tdNB('………………………………')}
