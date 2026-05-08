@@ -121,35 +121,40 @@ class ReportService {
   // تصدير صور برنامج كـ ZIP
   // ──────────────────────────────────────────────
   Future<String> exportPhotosZip(
-      String program, List<Map<String, String>> images) async {
-    final archive = Archive();
-    int count = 0;
+    String program, List<Map<String, String>> images) async {
+   int count = 0;
 
-    for (final img in images) {
-      final path = img['path'] ?? '';
-      final name = img['name'] ?? '';
-      if (path.isEmpty || name.isEmpty) continue;
-      final file = File(path);
-      if (!await file.exists()) continue;
-      final bytes = await file.readAsBytes();
-      archive.addFile(ArchiveFile(name, bytes.length, bytes));
-      count++;
-    }
+   final dl = await _outputDir();
+   final safeProg = program
+      .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+      .replaceAll(' ', '_');
+   final zipPath = p.join(dl.path, 'صور_المنتهية_المشغولة_${safeProg}_${DateTime.now().millisecondsSinceEpoch}.zip');
 
-    if (count == 0) throw Exception('لا توجد صور للتصدير');
+   final encoder = ZipFileEncoder();
+    encoder.create(zipPath);
 
-    final zipBytes = ZipEncoder().encode(archive)!;
-    final dl = await _outputDir();
+   for (final img in images) {
+    final path = img['path'] ?? '';
+    final name = img['name'] ?? '';
+    if (path.isEmpty || name.isEmpty) continue;
+    final file = File(path);
+    if (!await file.exists()) continue;
+    // اسم الملف داخل ZIP: اسم_البرنامج_اسم_الصورة_الأصلي
+    final entry = '${safeProg}_$name'.replaceAll(' ', '_');
+    await encoder.addFile(file, entryName: entry);
+    count++;
+   }
 
-    final safeProg = program
-        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
-        .replaceAll(' ', '_');
-    final fname = 'صور_المنتهية_المشغولة_${safeProg}_$count.zip';
-    final file = File(p.join(dl.path, fname));
-    await file.writeAsBytes(zipBytes);
-    return file.path;
+   await encoder.close();
+
+   if (count == 0) {
+    await File(zipPath).delete();
+    throw Exception('لا توجد صور للتصدير');
+   }
+
+   return zipPath;
   }
-
+  
   // ──────────────────────────────────────────────
   // بناء document.xml — مطابقة لصورة الـ PV المرسلة
   // ──────────────────────────────────────────────
@@ -194,7 +199,7 @@ class ReportService {
 
 <!-- ═══════════════ ديباجة اللجنة ═══════════════ -->
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="200" w:after="120"/></w:pPr>
+  <w:p><w:pPr><w:jc w:val="right"/><w:ind w:right="720"/></w:pPr>
   <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">في يوم ${_x(d.date)} ، قامت اللجنة المكلفة بإحصاء و متابعة السكن ، و المشكلة من :</w:t>
   </w:r>
@@ -202,16 +207,16 @@ class ReportService {
 
 <w:p><w:pPr><w:jc w:val="right"/><w:ind w:right="720"/></w:pPr>
   <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">- السيدة : ${_x(d.member1Name)} ${_x(d.member1Role)}</w:t></w:r></w:p>
+    <w:t xml:space="preserve">- (السيد(ة : ${_x(d.member1Name)} ${_x(d.member1Role)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/><w:ind w:right="720"/></w:pPr>
   <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">- السيد : ${_x(d.member2Name)} ${_x(d.member2Role)}</w:t></w:r></w:p>
+    <w:t xml:space="preserve">- (ة)السيد : ${_x(d.member2Name)} ${_x(d.member2Role)}</w:t></w:r></w:p>
 <w:p><w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:after="200"/></w:pPr>
   <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">- السيد : ${_x(d.member3Name)} ${_x(d.member3Role)}</w:t></w:r></w:p>
+    <w:t xml:space="preserve">- (ة)السيد : ${_x(d.member3Name)} ${_x(d.member3Role)}</w:t></w:r></w:p>
 
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="120" w:after="120"/></w:pPr>
+  <w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:after="200"/></w:pPr>
   <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
     <w:t xml:space="preserve">بتنفيذ معاينة ميدانية و إحصاء شامل للسكنات الريفية ضمن برنامج : </w:t>
   </w:r>
@@ -220,7 +225,7 @@ class ReportService {
 </w:p>
 
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="0" w:after="240"/></w:pPr>
+  <w:pPr><w:jc w:val="right"/><w:ind w:right="720"/><w:spacing w:after="200"/></w:pPr>
   <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
     <w:t>بعد إتمام عملية المعاينة و الجرد الدقيق ، خلصت اللجنة إلى ما يلي :</w:t>
   </w:r>
@@ -286,9 +291,9 @@ class ReportService {
 </w:p>
 
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="0" w:after="80"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
-    <w:t xml:space="preserve">ضمن قرص مضغوط (CD) يتضمن :</w:t>
+  <w:pPr><w:jc w:val="center"/><w:spacing w:before="200" w:after="200"/></w:pPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
+    <w:t xml:space="preserve">  قرص مضغوط يتضمن (CD) :</w:t>
   </w:r>
 </w:p>
 
@@ -307,8 +312,8 @@ class ReportService {
 
 <!-- ═══════════════ خاتمة ═══════════════ -->
 <w:p>
-  <w:pPr><w:jc w:val="both"/><w:spacing w:before="240" w:after="200"/></w:pPr>
-  <w:r><w:rPr><w:sz w:val="22"/><w:rtl/></w:rPr>
+  <w:pPr><w:jc w:val="center"/><w:spacing w:before="200" w:after="200"/></w:pPr>
+  <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:rtl/></w:rPr>
     <w:t>اقفل المحضر في نفس اليوم و الشهر و السنة المذكورين أعلاه .</w:t>
   </w:r>
 </w:p>
@@ -329,9 +334,9 @@ class ReportService {
     <w:gridCol w:w="3166"/><w:gridCol w:w="3167"/><w:gridCol w:w="3167"/>
   </w:tblGrid>
   <w:tr>
-    ${_thNB('رئيسة فرع السكن – الدائرة')}
-    ${_thNB('المكلف بالبناء الريفي – البلدية')}
-    ${_thNB('المكلف بالبناء الريفي – البلدية')}
+    ${_thNB('رئيس(ة) فرع السكن – الدائرة')}
+    ${_thNB('المكلف(ة) بالبناء الريفي – الدائرة')}
+    ${_thNB('المكلف(ة) بالبناء الريفي – البلدية')}
   </w:tr>
   <w:tr><w:trPr><w:trHeight w:val="900"/></w:trPr>
     ${_tdNB('………………………………')}
